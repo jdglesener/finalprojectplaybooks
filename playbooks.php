@@ -2,20 +2,19 @@
 include "conn_config.php";
 ini_set('display_errors', 1);
 ini_set('display_startup_errors',1);
-error_reporting(E_ALL);
 
-if(!isset($_REQUEST["userid"])) {
-  $msg= "Please Sign In or Create an Account"; 
+error_reporting(E_ALL);
+if (!isset($_COOKIE["loggedin"]) || !$_COOKIE["loggedin"]) {
+  $msg = "Please sign in to view a playbook";
   echo "<script>alert('$msg');</script>"; 
-  echo "<script>window.location.href = 'login.php'</script>";  
+  echo "<script>window.location.href = 'login.php' </script>";  
 }
-$uid = $_REQUEST["userid"];
+$uid = $_COOKIE["userid"];
 $query = "SELECT * FROM users WHERE username = '$uid'";
 $result = mysqli_query($conn, $query);
 $row = mysqli_fetch_array($result);
 $teamid = $row["teamid"];
-$iscoach = $row["coach"];
-
+$iscoach = $row["coach"]; 
 if($_SERVER["REQUEST_METHOD"]== "POST"){
   $n_playname = $_POST["playname"];
   $n_playtype =$_POST["playtype"];
@@ -32,12 +31,13 @@ if($_SERVER["REQUEST_METHOD"]== "POST"){
   $query = "INSERT INTO `Playbook` (`playid`, `teamid`, `playbookid`, `playbookname`, `playname`) VALUES ('$val', '$teamid', '$n_playbookid', '$n_playbookname', '$n_playname');";
   $result = mysqli_query($conn, $query);
   unset($_POST);
-  }
-  if (isset($_GET['delid'])){
-    $delid=$_GET['delid'];
-    $sql=mysqli_query($conn,"DELETE FROM playbooks where playname='$delid' AND teamid = '$teamid'");
-    echo "<script>alert('Item Deleted');</script>";
-    echo "<script>location.reload();</script>";
+}
+if (isset($_GET['delid'])){
+  $delid=$_GET['delid'];
+  $sql=mysqli_query($conn,"DELETE FROM playbook where playname='$delid' AND teamid = '$teamid'");
+  echo "<script>alert('Item Deleted');</script>";
+  unset($_GET['delid']);  
+  echo "<script>eindow.location.href = 'playbooks.php'</script>";
   }
 ?>
 <!DOCTYPE html>
@@ -93,6 +93,7 @@ if($_SERVER["REQUEST_METHOD"]== "POST"){
             <ul>
               <li><a href="team.php">My Team</a></li>
               <li><a href="profile.php">Settings</a></li>
+              <li><a href="sign-out.php">Sign Out</a></li>
             </ul>
           </li>
         </ul>
@@ -182,7 +183,7 @@ if($_SERVER["REQUEST_METHOD"]== "POST"){
                 <?php
             if ($iscoach == 1) {
           ?>
-                <td><a href='?userid=<?php echo $n_username; ?>?delid=<?php echo $row1['playname'];?>?' class="delete" title="Delete" data-toggle="tooltip" onclick="return confirm('Do you really want to Delete?')"> Delete </a></td>
+                <td><a href='?delid=<?php echo $row1['playname'];?>' class="delete" title="Delete" data-toggle="tooltip" onclick="return confirm('Do you really want to Delete?')"> Delete </a></td>
           <?php } ?>
               </tr>
               <?php 
@@ -294,11 +295,6 @@ if($_SERVER["REQUEST_METHOD"]== "POST"){
 
   <!-- Template Main JS File -->
   <script src="assets/js/main.js"></script>
-  <script>
-    $(document).ready(function(){
-        $("#staticBackdrop").modal('show');
-    });
-  </script>
 </body>
 
 </html>

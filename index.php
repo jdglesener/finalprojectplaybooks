@@ -59,13 +59,15 @@ if (isset($_GET['delid'])){
 
       <nav id="navbar" class="navbar">
         <ul>
+          <?php if (isset($_COOKIE["loggedin"]) && $_COOKIE["loggedin"]) {?>
           <li><a class="nav-link scrollto" href="playbooks.php">My Playbooks</a></li>
-          <li class="dropdown"><a href="#"><!--<img src="#""> --><span>Your Profile</span><i class="bi bi-chevron-down"></i></a>
+          <li class="dropdown"><a href="#"><span>Your Profile</span><i class="bi bi-chevron-down"></i></a>
             <ul>
               <li><a href="team.php">My Team</a></li>
               <li><a href="profile.php">Settings</a></li>
             </ul>
           </li>
+          <?php } ?>
         </ul>
         <i class="bi bi-list mobile-nav-toggle"></i>
       </nav><!-- .navbar -->
@@ -76,15 +78,22 @@ if (isset($_GET['delid'])){
 
   <main id="main">    
     <!-- ======= About Section ======= -->
+    <br>
+  <?php 
+/*   $command = '/usr/local/bin/python3 test.py';
+  $output = shell_exec($command);
+  echo $output; */
+  ?>
     <section id="about" class="about">
     <div class="px-4 py-5 my-5 text-center">
     <h1 class="display-5 fw-bold text-body-emphasis">Playbook designer</h1>
     <div class="col-lg-6 mx-auto">
-      <?php # IF SIGNED IN, SHOW THESE BUTTONS?>
       <p class="lead mb-4">Create and share simplified playbooks that can help your team get on the same page. Invite your players so that you can set your gameplan. Create multiple playbooks for different scouts and share different plays with different team groups.</p>
-      <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+      <div class="d-grid gap-2 d-sm-flex justify-content-sm-center"> 
+        <?php if (!isset($_COOKIE["loggedin"]) || !$_COOKIE["loggedin"]) {?>
         <a class="btn btn-primary btn-lg px-4 gap-3" href="sign-up.php" role="button">Sign up</a>
         <a class="btn btn-outline-secondary btn-lg px-4" href="login.php" role="button">Log in</a>
+        <?php }?>
       </div>
     </div>
   </div>
@@ -94,7 +103,7 @@ if (isset($_GET['delid'])){
   </main><!-- End #main -->
 
   <!-- ======= Footer ======= -->
-  <footer id="footer">
+  <footer id="footer" class="fixed-bottom">
 
     <div class="container py-4">
       <div class="copyright">

@@ -4,6 +4,9 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors',1);
 error_reporting(E_ALL);
 
+setcookie("userid", "", time() - 3600, "/");
+setcookie("loggedin", "", time() - 3600, "/");
+
 if($_SERVER["REQUEST_METHOD"]== "POST"){
   $n_username = $_POST["username"];
   $n_password = $_POST["password"];
@@ -11,8 +14,10 @@ if($_SERVER["REQUEST_METHOD"]== "POST"){
   $result = mysqli_query($conn, $query);
   if(mysqli_num_rows($result) == 1) {
     $msg= "Welcome '$n_accountname'"; 
+    setcookie("loggedin", true, time() + (86400 * 30), "/");
+    setcookie("userid", $n_username, time() + (86400 * 30), "/");
     echo "<script>alert('$msg');</script>"; 
-    echo "<script>window.location.href = 'playbooks.php?userid=".$n_username."' </script>";  
+    echo "<script>window.location.href = 'playbooks.php' </script>";  
   } else {
     $msg = "The entered username or password is incorrect";
   }
