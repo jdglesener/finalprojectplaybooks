@@ -106,7 +106,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["delid"])){
               <li><a href="team.php">My Team</a></li>
               <li>
                 <form action = "sign-out.php" method = "POST">
-                  <button class = "btn" type = "submit">Sign Out</button>
+                  <button class = "btn btn-outline-secondary" type = "submit">Sign Out</button>
                 </form>
               </li>
             </ul>
