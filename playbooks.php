@@ -7,7 +7,7 @@ error_reporting(E_ALL);
 if (!isset($_COOKIE["loggedin"]) || !$_COOKIE["loggedin"]) {
   $msg = "Please sign in to view a playbook";
   echo "<script>alert('$msg');</script>"; 
-  echo "<script>window.location.href = 'login.php' </script>";  
+  echo "<script>window.location.href = 'index.php' </script>";  
 }
 $uid = $_COOKIE["userid"];
 $query = "SELECT * FROM users WHERE username = '$uid'";
@@ -15,7 +15,7 @@ $result = mysqli_query($conn, $query);
 $row = mysqli_fetch_array($result);
 $teamid = $row["teamid"];
 $iscoach = $row["coach"]; 
-if($_SERVER["REQUEST_METHOD"]== "POST"){
+if($_SERVER["REQUEST_METHOD"]== "POST" && isset($_POST["playname"]) && isset($_POST["yards"])){
   $n_playname = $_POST["playname"];
   $n_playtype =$_POST["playtype"];
   $n_personnel =$_POST["personnel"];
@@ -30,14 +30,26 @@ if($_SERVER["REQUEST_METHOD"]== "POST"){
   $val = $row['playid'];
   $query = "INSERT INTO `Playbook` (`playid`, `teamid`, `playbookid`, `playbookname`, `playname`) VALUES ('$val', '$teamid', '$n_playbookid', '$n_playbookname', '$n_playname');";
   $result = mysqli_query($conn, $query);
-  unset($_POST);
 }
-if (isset($_GET['delid'])){
-  $delid=$_GET['delid'];
-  $sql=mysqli_query($conn,"DELETE FROM playbook where playname='$delid' AND teamid = '$teamid'");
-  echo "<script>alert('Item Deleted');</script>";
-  unset($_GET['delid']);  
-  echo "<script>eindow.location.href = 'playbooks.php'</script>";
+
+if($_SERVER["REQUEST_METHOD"]== "POST" && isset($_POST["newplaybookname"])){
+  $n_playbookname = $_POST["newplaybookname"];
+  $n_playbookid = mysqli_fetch_assoc(mysqli_query($conn, "SELECT playbookid + 1 AS new FROM `Playbook` ORDER BY playbookid DESC LIMIT 1;"))["new"];
+  $query = "INSERT INTO `Playbook` (`playid`, `teamid`, `playbookid`, `playbookname`, `playname`) VALUES (1, '$teamid', '$n_playbookid', '$n_playbookname', 'Dive Right');";
+  $result = mysqli_query($conn, $query);
+
+}
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["delid"])){
+  $delid = $_POST['delid'];   
+  $pid = $_POST['playbookid'];
+  $sql=mysqli_query($conn,"DELETE FROM playbook where playname='$delid' AND playbookid = '$pid' AND teamid=$teamid");
+  echo "<script>alert('Play Deleted');</script>";
+  }
+  if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["delplaybookid"])){
+    $delplaybookid = $_POST['delplaybookid'];
+    $delplaybook = $_POST['delplaybook'];  
+    $sql=mysqli_query($conn,"DELETE FROM playbook where playbookname='$delplaybookid' AND teamid='$teamid' AND playbookid='$delplaybook'");
+    echo "<script>alert('Playbook Deleted');</script>";
   }
 ?>
 <!DOCTYPE html>
@@ -80,7 +92,7 @@ if (isset($_GET['delid'])){
 
 <body>
   <!-- ======= Header ======= -->
-  <header id="header" class="fixed-top">
+  <header id="header" class="sticky-top">
     <div class="container d-flex align-items-center justify-content-between">
 
       <!-- Uncomment below if you prefer to use text as a logo -->
@@ -89,11 +101,14 @@ if (isset($_GET['delid'])){
       <nav id="navbar" class="navbar">
         <ul>
           <li><a class="nav-link scrollto active" href="#about">My Playbooks</a></li>
-          <li class="dropdown"><a href="#"><span>Your Profile</span><i class="bi bi-chevron-down"></i></a>
+          <li class="dropdown"><span>Your Profile</span><i class="bi bi-chevron-down"></i>
             <ul>
               <li><a href="team.php">My Team</a></li>
-              <li><a href="profile.php">Settings</a></li>
-              <li><a href="sign-out.php">Sign Out</a></li>
+              <li>
+                <form action = "sign-out.php" method = "POST">
+                  <button class = "btn" type = "submit">Sign Out</button>
+                </form>
+              </li>
             </ul>
           </li>
         </ul>
@@ -124,14 +139,7 @@ if (isset($_GET['delid'])){
             GROUP BY pl.playbookname, pl.playbookid;";
             $result = mysqli_query($conn, $query);
             if ($result) {
-              if(mysqli_num_rows($result) == 0) {
                 ?>
-                <a href="#">
-                <button class="btn btn-primary" type="button">Create A Playbook</button>
-                </a>
-                <?php
-              }
-   ?>
   <div class="accordion">
 
         <?php
@@ -183,7 +191,11 @@ if (isset($_GET['delid'])){
                 <?php
             if ($iscoach == 1) {
           ?>
-                <td><a href='?delid=<?php echo $row1['playname'];?>' class="delete" title="Delete" data-toggle="tooltip" onclick="return confirm('Do you really want to Delete?')"> Delete </a></td>
+                <td><form action="playbooks.php" method = "POST">
+                  <input type="hidden" name = "delid" value = "<?php echo $row1["playname"];?>">
+                  <input type="hidden" name = "playbookid" value = "<?php echo $pi;?>">
+                  <button type="submit" class="btn btn-secondary">Delete</button>
+                </form></td>
           <?php } ?>
               </tr>
               <?php 
@@ -196,9 +208,18 @@ if (isset($_GET['delid'])){
           <?php
             if ($iscoach == 1) {
           ?>
-          <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
-              Add A Play
-          </button>
+          <div class="mb-3">
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+                Add A Play
+            </button>
+            <form action="playbooks.php" method = "POST">
+              <input type="hidden" name="delplaybookid" value="<?php echo $pb;?>">
+              <input type="hidden" name="delplaybook" value="<?php echo $pi?>">
+              <button type="submit" class="btn btn-primary" data-bs-toggle="modal">
+                Delete This Playbook
+              </button>
+            </form>
+          </div>
           <?php } ?>
           <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
             <div class="modal-dialog">
@@ -263,8 +284,33 @@ if (isset($_GET['delid'])){
           </div>
         </div>
       </div>
-              
       </div>
+      <br>
+      <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#playbookStatic">
+              Add A Playbook
+      </button>
+      <div class="modal fade" id="playbookStatic" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h1 class="modal-title fs-5" id="staticBackdropLabel">Add a Playbook</h1>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+                <form class="p-4 p-md-5 border rounded-3 bg-body-tertiary" method = "POST" process="playbooks.php">
+                  <div class="mb-3">
+                    <h2>Playbook Name</h2>
+                    <input name = "newplaybookname" class="form-control" placeholder="">
+                  </div>
+                  <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                  <button type="submit" class="btn btn-primary">Add Playbook</button>
+                </form>
+                </div>
+              </div>
+            </div>
+          </div>
     </section><!-- End About Section -->
     
   </main><!-- End #main -->

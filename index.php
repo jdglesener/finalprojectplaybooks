@@ -1,15 +1,5 @@
 <?php
 include "conn_config.php";
-ini_set('display_errors', 1);
-ini_set('display_startup_errors',1);
-error_reporting(E_ALL);
-
-if (isset($_GET['delid'])){
-  $delid=$_GET['delid'];
-  $sql=mysqli_query($conn,"DELETE FROM articles where articleID ='$delid'");
-  echo "<script>alert('Item Deleted');</script>";
-  echo "<script>eindow.location.href = 'index.php'</script>";
-}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -64,7 +54,11 @@ if (isset($_GET['delid'])){
           <li class="dropdown"><a href="#"><span>Your Profile</span><i class="bi bi-chevron-down"></i></a>
             <ul>
               <li><a href="team.php">My Team</a></li>
-              <li><a href="profile.php">Settings</a></li>
+              <li>
+                <form action = "sign-out.php" method = "POST">
+                  <button class = "btn btn-outline-secondary" type = "submit">Sign Out</button>
+                </form>
+              </li>
             </ul>
           </li>
           <?php } ?>

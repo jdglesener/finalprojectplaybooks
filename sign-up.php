@@ -6,22 +6,36 @@ error_reporting(E_ALL);
 
 if($_SERVER["REQUEST_METHOD"]== "POST"){
   $n_id = $_POST["userid"];
-  $n_pw =$_POST["pw"];
-  $n_accountname =$_POST["acctnm"];
-  $n_teamname =$_POST["tmnm"];
+  $n_pw = $_POST["pw"];
+  $n_accountname = $_POST["acctnm"];
+  $n_teamname = $_POST["tmnm"];
   $query = "SELECT * FROM users WHERE username = '$n_id'";
   $result = mysqli_query($conn, $query);
   if(mysqli_num_rows($result) == 0) {
     $query = "SELECT * FROM team WHERE teamname = '$n_teamname'";
     $result = mysqli_query($conn, $query);
-    if(mysqli_num_rows($result) == 0) {
+    if(isset($_REQUEST['teamid']) && (!isset($_REQUEST['coach']) || !$_REQUEST['coach'])) {
+      echo "eval1";
+      $val = $_REQUEST['teamid'];
+      $coach = 0;
+      $query = "INSERT INTO `Users` (`userid`, `username`, `password`, `name`, `coach`, `teamid`) VALUES (NULL, '$n_id', '$n_pw', '$n_accountname', '$coach', '$val');";
+      $exe = mysqli_query($conn, $query);
+    } else if (isset($_GET['coach']) && $_GET['coach'] == 'true') {
+      echo "eval2";
+      $val = $_REQUEST['teamid'];
+      $coach = 1;
+      $query = "INSERT INTO `Users` (`userid`, `username`, `password`, `name`, `coach`, `teamid`) VALUES (NULL, '$n_id', '$n_pw', '$n_accountname', '$coach', '$val');";
+      $exe = mysqli_query($conn, $query);
+    } else if(mysqli_num_rows($result) == 0) {
+      echo "eval3";
       $query = "INSERT INTO `Team` (`teamid`, `teamname`) VALUES (NULL, '$n_teamname');";
       $exe = mysqli_query($conn, $query);
       $query = "SELECT teamid FROM team WHERE teamname = '$n_teamname'";
       $result = mysqli_query($conn, $query);
       $row = mysqli_fetch_assoc($result);
       $val = $row['teamid'];
-      $query ="INSERT INTO `Users` (`userid`, `username`, `password`, `name`, `coach`, `teamid`) VALUES (NULL, '$n_id', '$n_pw', '$n_accountname', '1', '$val');";
+      $coach = 1;
+      $query = "INSERT INTO `Users` (`userid`, `username`, `password`, `name`, `coach`, `teamid`) VALUES (NULL, '$n_id', '$n_pw', '$n_accountname', '$coach', '$val');";
       $exe = mysqli_query($conn, $query);
     } else {
       $msg = "This team already exists";
@@ -30,9 +44,11 @@ if($_SERVER["REQUEST_METHOD"]== "POST"){
     $msg = "This username already exists";
   }
   if(isset($exe)){
+    setcookie("loggedin", true, time() + (86400 * 30), "/");
+    setcookie("userid", $n_id, time() + (86400 * 30), "/");
     $msg= "Thanks for creating a team, '$n_accountname'"; 
     echo "<script>alert('$msg');</script>"; 
-    echo "<script>window.location.href = 'playbooks.php?userid=".$n_id."' </script>";  
+    #echo "<script>window.location.href = 'playbooks.php?userid=".$n_id."' </script>";  
   }
 }
 
@@ -82,20 +98,6 @@ if($_SERVER["REQUEST_METHOD"]== "POST"){
 
       <!-- Uncomment below if you prefer to use text as a logo -->
       <h1 class="logo"><a href="index.php">Football Playbook</a></h1>
-
-      <nav id="navbar" class="navbar">
-        <ul>
-          <li><a class="nav-link scrollto" href="playbooks.php">My Playbooks</a></li>
-          <li class="dropdown"><a href="#"><span>Your Profile</span><i class="bi bi-chevron-down"></i></a>
-            <ul>
-              <li><a href="team.php">My Team</a></li>
-              <li><a href="profile.php">Settings</a></li>
-            </ul>
-          </li>
-        </ul>
-        <i class="bi bi-list mobile-nav-toggle"></i>
-      </nav><!-- .navbar -->
-
     </div>
   </header><!-- End Header -->
 
@@ -112,8 +114,31 @@ if($_SERVER["REQUEST_METHOD"]== "POST"){
         <div class="alert alert-warning" role="alert">
           <?php echo $msg; ?>
         </div>
-      <?php } ?>
-        <form class="p-4 p-md-5 border rounded-3 bg-body-tertiary" action = "sign-up.php" method = "POST">
+      <?php } 
+      ?>
+
+          <?php if (isset($_REQUEST["teamid"]) && $_REQUEST["teamid"]) {
+            $teamid = $_REQUEST['teamid'];
+            if (isset($_REQUEST["coach"]) && $_REQUEST["coach"] == "true") {
+              $coach = $_REQUEST["coach"];
+              $action = "sign-up.php?coach=$coach&teamid=$teamid";
+            } else {
+              $action = "sign-up.php?teamid=$teamid";
+            }
+            ?>
+            <h4><?php 
+              $teamname = mysqli_fetch_assoc(mysqli_query($conn, "SELECT teamname FROM `Team` WHERE teamid = $teamid;"))['teamname'];
+              echo "Welcome to ".$teamname." Football";
+              ?></h4>
+              <form class="p-4 p-md-5 border rounded-3 bg-body-tertiary" action = "<?php echo $action;?>" method = "POST">
+              <input name = "tmnm" type='hidden' value="<?php echo $teamname?>">
+          <?php } else {?>
+          <form class="p-4 p-md-5 border rounded-3 bg-body-tertiary" action = "sign-up.php" method = "POST">
+          <div class="form-floating mb-3">
+            <input name = "tmnm" class="form-control" id="floatingInput" placeholder="name@example.com">
+            <label for="floatingInput">Team Name</label>
+          </div>
+          <?php }?>
           <div class="form-floating mb-3">
             <input name="userid" class="form-control" id="floatingInput" placeholder="name@example.com">
             <label for="floatingInput">Username</label>
@@ -126,12 +151,9 @@ if($_SERVER["REQUEST_METHOD"]== "POST"){
             <input name = "acctnm" class="form-control" id="floatingInput" placeholder="name@example.com">
             <label for="floatingInput">Account Name</label>
           </div>
-          <div class="form-floating mb-3">
-            <input name = "tmnm" class="form-control" id="floatingInput" placeholder="name@example.com">
-            <label for="floatingInput">Team Name</label>
-          </div>
           <button class="w-100 btn btn-lg btn-primary" type="submit">Sign Up</button>
           <hr class="my-4">
+          <small class="text-body-secondary">Already have an account? <a href="login.php">Log in Here</a></small>
         </form>
       </div>
     </div>

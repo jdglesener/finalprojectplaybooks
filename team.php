@@ -4,6 +4,19 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors',1);
 error_reporting(E_ALL);
 
+if (!isset($_COOKIE["loggedin"]) || !$_COOKIE["loggedin"]) {
+  $msg = "Please sign in to view your team";
+  echo "<script>alert('$msg');</script>"; 
+  echo "<script>window.location.href = 'index.php' </script>";  
+}
+
+$uid = $_COOKIE["userid"];
+$query = "SELECT * FROM users WHERE username = '$uid'";
+$result = mysqli_query($conn, $query);
+$row = mysqli_fetch_array($result);
+$teamid = $row["teamid"];
+$iscoach = $row["coach"]; 
+
 if (isset($_GET['delid'])){
   $delid=$_GET['delid'];
   $sql=mysqli_query($conn,"DELETE FROM articles where articleID ='$delid'");
@@ -86,40 +99,57 @@ if (isset($_GET['delid'])){
 
         <div class="row">
           <div class="col-xl-12 col-lg-12 icon-boxes d-flex flex-column align-items-stretch justify-content-center py-5 px-lg-5">
-            <h3>List of Your Players</h3>
-            <!--
-              * WRITE PHP MYSQL CODE THAT QUERY THE DATABASE AND DISPLAY EACH RECORD BELOW. 
-              * TURN EACH OF THIS DIV TO A BLOCK THAT DISPLAY EACH RECORD FROM THE RESULT OF THE QUERY --->
-              <?php 
-            if($_SERVER["REQUEST_METHOD"]=="POST") {
-            $filter=$_POST["category"];
-            $query = "SELECT * FROM category C, articles A WHERE A.categoryID = '$filter' AND C.categoryID=A.categoryID";
-            $result = mysqli_query($conn, $query);
-            if ($result) {
-              $i = 1;
-              foreach($result as $row) {
+            <h3>Your Team</h3>
+              <table class="table table-striped table-sm">
+              <thead>
+                <tr>
+                  <th scope="col">#</th>
+                  <th scope="col">Name</th>
+                  <th scope="col">Role</th>
+                </tr>
+              </thead>
+              <tbody>
+                <?php 
+                $query1 = "SELECT * FROM users u
+                WHERE u.teamid = $teamid";
+                $result1 = mysqli_query($conn, $query1);
+                if ($result1) {
+                  $j = 1;
+                  foreach($result1 as $row1) {
+                ?>
+                <tr>
+                  <td><?php echo $j ?></td>
+                  <td><?php echo $row1["name"] ?></td>
+                  <td><?php if ($row1["coach"]) {echo "Coach";} else {echo "Player";}?> </td>
+                  <?php
+              if ($iscoach == 1) {}
             ?>
-            <div class="icon-box">
-              <div class="icon"><i class="bx bx-fingerprint"></i></div>
-              <h4 class="title"><a href=""><?php echo $row["publication_year"] ?></a></h4>
-              <p class="description"> <?php echo $row["title"]?></p>
-              <p class="description"> <?php echo $row["authors"]?></p>
-              <p class="description"> <em><?php echo $row["publisher"]?></em></p>
-              <?php if($row['DOI_link'] != 'N/A') {?> 
-              <p class="description"> <a href="<?php echo $row["DOI_link"]?>"><?php echo $row["DOI_link"]?></a></p>
-              <?php }?>
-              <p><a href="edit.php?eid=<?php echo ($row['articleID']);?>"> Edit</a></p>
-              <p><a href="?delid=<?php echo $row['articleID'];?>" class="delete" title="Delete" data-toggle="tooltip" onclick="return confirm('Do you really want to Delete?')"> Delete </a></p>
-
-            </div>
-            <?php
-              }
-            }
-          }
-            ?>
+                  <td><form action="playbooks.php" method = "POST">
+                    <input type="hidden" name = "delid" value = "<?php echo $row1["userid"];?>">
+                    <button type="submit" class="btn btn-secondary">Delete</button>
+                  </form></td>
+            <?php $j++; } 
+          }?>
+                </tr>
+                <?php 
+                ?>
+              </tbody>
+            </table>
           </div>
         </div>
               
+      </div>
+      <div class = "col-xl-12 col-lg-12 icon-boxes d-flex flex-column align-items-stretch justify-content-center py-5 px-lg-5">
+            <h4>Want to add a new Player or Coach?</h4>
+            <h5>Use the link below for coaches</h5>
+            
+                <div class = "text-bg-secondary p-3">
+                  <?php echo "http://localhost/finalproject/sign-up.php?coach=true&teamid=".$teamid?>
+                </div>
+            <h5>Use the link below for players</h5>
+                <div class = "text-bg-secondary p-3">
+                  <?php echo "http://localhost/finalproject/sign-up.php?teamid=".$teamid?>
+                </div>
       </div>
     </section><!-- End About Section -->
     

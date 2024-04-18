@@ -1,12 +1,9 @@
 <?php
 include "conn_config.php";
-ini_set('display_errors', 1);
-ini_set('display_startup_errors',1);
-error_reporting(E_ALL);
 
-setcookie("userid", "", time() - 3600, "/");
-setcookie("loggedin", "", time() - 3600, "/");
-
+if (isset($_COOKIE["loggedin"]) && $_COOKIE["loggedin"]) {
+  echo "<script>window.location.href = 'playbooks.php' </script>";  
+}
 if($_SERVER["REQUEST_METHOD"]== "POST"){
   $n_username = $_POST["username"];
   $n_password = $_POST["password"];
@@ -14,8 +11,8 @@ if($_SERVER["REQUEST_METHOD"]== "POST"){
   $result = mysqli_query($conn, $query);
   if(mysqli_num_rows($result) == 1) {
     $msg= "Welcome '$n_accountname'"; 
-    setcookie("loggedin", true, time() + (86400 * 30), "/");
-    setcookie("userid", $n_username, time() + (86400 * 30), "/");
+    setcookie("loggedin", true, time() + (86400), "/");
+    setcookie("userid", $n_username, time() + (86400), "/");
     echo "<script>alert('$msg');</script>"; 
     echo "<script>window.location.href = 'playbooks.php' </script>";  
   } else {
@@ -70,19 +67,6 @@ if($_SERVER["REQUEST_METHOD"]== "POST"){
       <!-- Uncomment below if you prefer to use text as a logo -->
       <h1 class="logo"><a href="index.php">Football Playbook</a></h1>
 
-      <nav id="navbar" class="navbar">
-        <ul>
-          <li><a class="nav-link scrollto" href="playbooks.php">My Playbooks</a></li>
-          <li class="dropdown"><a href="#"><span>Your Profile</span><i class="bi bi-chevron-down"></i></a>
-            <ul>
-              <li><a href="team.php">My Team</a></li>
-              <li><a href="profile.php">Settings</a></li>
-            </ul>
-          </li>
-        </ul>
-        <i class="bi bi-list mobile-nav-toggle"></i>
-      </nav><!-- .navbar -->
-
     </div>
   </header><!-- End Header -->
 
@@ -110,7 +94,7 @@ if($_SERVER["REQUEST_METHOD"]== "POST"){
           </div>
           <button class="w-100 btn btn-lg btn-primary" type="submit">Log In</button>
           <hr class="my-4">
-          <small class="text-body-secondary">Don't have an account? <a href="sign-up.php">Sign Up Here</a></small>
+          <small class="text-body-secondary">Don't have an account? <a href="sign-up.php">Make An Team Here</a></small>
         </form>
       </div>
     </div>
