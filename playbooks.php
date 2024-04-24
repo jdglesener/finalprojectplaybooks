@@ -1,9 +1,9 @@
 <?php
 include "conn_config.php";
-ini_set('display_errors', 1);
+/* ini_set('display_errors', 1);
 ini_set('display_startup_errors',1);
 
-error_reporting(E_ALL);
+error_reporting(E_ALL); */
 if (!isset($_COOKIE["loggedin"]) || !$_COOKIE["loggedin"]) {
   $msg = "Please sign in to view a playbook";
   echo "<script>alert('$msg');</script>"; 
@@ -101,7 +101,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["delid"])){
       <nav id="navbar" class="navbar">
         <ul>
           <?php if (isset($_COOKIE["loggedin"]) && $_COOKIE["loggedin"]) {?>
-          <li><a class="nav-link scrollto" href="playbooks.php">My Playbooks</a></li>
+          <li><a class="nav-link scrollto active" href="playbooks.php">My Playbooks</a></li>
           <li class="dropdown"><a href="#"><span>Your Profile</span><i class="bi bi-chevron-down"></i></a>
             <ul>
               <li><a href="team.php">My Team</a></li>
