@@ -72,13 +72,19 @@ if (isset($_GET['delid'])){
 
       <nav id="navbar" class="navbar">
         <ul>
+          <?php if (isset($_COOKIE["loggedin"]) && $_COOKIE["loggedin"]) {?>
           <li><a class="nav-link scrollto" href="playbooks.php">My Playbooks</a></li>
           <li class="dropdown"><a href="#"><span>Your Profile</span><i class="bi bi-chevron-down"></i></a>
             <ul>
               <li><a href="team.php">My Team</a></li>
-              <li><a href="profile.php">Settings</a></li>
+              <li>
+                <form action = "sign-out.php" method = "POST">
+                  <button class = "btn btn-outline-secondary" type = "submit">Sign Out</button>
+                </form>
+              </li>
             </ul>
           </li>
+          <?php } ?>
         </ul>
         <i class="bi bi-list mobile-nav-toggle"></i>
       </nav><!-- .navbar -->

@@ -1,9 +1,9 @@
 <?php
-/* include "conn_config.php";
+include "conn_config.php";
 ini_set('display_errors', 1);
 ini_set('display_startup_errors',1);
-error_reporting(E_ALL); */
 
+error_reporting(E_ALL);
 if (!isset($_COOKIE["loggedin"]) || !$_COOKIE["loggedin"]) {
   $msg = "Please sign in to view a playbook";
   echo "<script>alert('$msg');</script>"; 
@@ -100,17 +100,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["delid"])){
 
       <nav id="navbar" class="navbar">
         <ul>
-          <li><a class="nav-link scrollto active" href="#about">My Playbooks</a></li>
-          <li class="dropdown">Your Profile<i class="bi bi-chevron-down"></i>
+          <?php if (isset($_COOKIE["loggedin"]) && $_COOKIE["loggedin"]) {?>
+          <li><a class="nav-link scrollto" href="playbooks.php">My Playbooks</a></li>
+          <li class="dropdown"><a href="#"><span>Your Profile</span><i class="bi bi-chevron-down"></i></a>
             <ul>
               <li><a href="team.php">My Team</a></li>
               <li>
                 <form action = "sign-out.php" method = "POST">
-                  <button class = "btn" type = "submit">Sign Out</button>
+                  <button class = "btn btn-outline-secondary" type = "submit">Sign Out</button>
                 </form>
               </li>
             </ul>
           </li>
+          <?php } ?>
         </ul>
         <i class="bi bi-list mobile-nav-toggle"></i>
       </nav><!-- .navbar -->
@@ -190,11 +192,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["delid"])){
                 <td><?php echo $row1["yards_goal"] ?></td>
                 <?php
             if ($iscoach == 1) {
-          ?>    <!-- <td>
-                  <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#PlayEdit">
-                    Edit
-                  </button>
-                </td> -->
+          ?>
                 <td><form action="playbooks.php" method = "POST">
                   <input type="hidden" name = "delid" value = "<?php echo $row1["playname"];?>">
                   <input type="hidden" name = "playbookid" value = "<?php echo $pi;?>">
@@ -212,8 +210,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["delid"])){
           <?php
             if ($iscoach == 1) {
           ?>
-          <div class="d-inline-flex p-2 m-3">
-            <button type="button" class="btn btn-primary me-3" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+          <div class="mb-3">
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
                 Add A Play
             </button>
             <form action="playbooks.php" method = "POST">
@@ -290,13 +288,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["delid"])){
       </div>
       </div>
       <br>
-      <?php
-            if ($iscoach == 1) {
-          ?>
       <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#playbookStatic">
               Add A Playbook
       </button>
-      <?php } ?>
       <div class="modal fade" id="playbookStatic" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
             <div class="modal-dialog">
               <div class="modal-content">
