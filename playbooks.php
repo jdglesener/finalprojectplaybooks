@@ -100,8 +100,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["delid"])){
 
       <nav id="navbar" class="navbar">
         <ul>
-          <li><a class="nav-link scrollto active" href="#about">My Playbooks</a></li>
-          <li class="dropdown"><span>Your Profile</span><i class="bi bi-chevron-down"></i>
+          <?php if (isset($_COOKIE["loggedin"]) && $_COOKIE["loggedin"]) {?>
+          <li><a class="nav-link scrollto" href="playbooks.php">My Playbooks</a></li>
+          <li class="dropdown"><a href="#"><span>Your Profile</span><i class="bi bi-chevron-down"></i></a>
             <ul>
               <li><a href="team.php">My Team</a></li>
               <li>
@@ -111,6 +112,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["delid"])){
               </li>
             </ul>
           </li>
+          <?php } ?>
         </ul>
         <i class="bi bi-list mobile-nav-toggle"></i>
       </nav><!-- .navbar -->
