@@ -1,14 +1,15 @@
 <?php
+include "conn_config.php";
 
 if($_SERVER["REQUEST_METHOD"]== "POST"){
   $n_id = $_POST["userid"];
   $n_pw = $_POST["pw"];
   $n_accountname = $_POST["acctnm"];
   $n_teamname = $_POST["tmnm"];
-  $query = "SELECT * FROM users WHERE username = '$n_id'";
+  $query = "SELECT * FROM Users WHERE username = '$n_id'";
   $result = mysqli_query($conn, $query);
   if(mysqli_num_rows($result) == 0) {
-    $query = "SELECT * FROM team WHERE teamname = '$n_teamname'";
+    $query = "SELECT * FROM Team WHERE teamname = '$n_teamname'";
     $result = mysqli_query($conn, $query);
     if(isset($_REQUEST['teamid']) && (!isset($_REQUEST['coach']) || !$_REQUEST['coach'])) {
       echo "eval1";
@@ -23,10 +24,9 @@ if($_SERVER["REQUEST_METHOD"]== "POST"){
       $query = "INSERT INTO `Users` (`userid`, `username`, `password`, `name`, `coach`, `teamid`) VALUES (NULL, '$n_id', '$n_pw', '$n_accountname', '$coach', '$val');";
       $exe = mysqli_query($conn, $query);
     } else if(mysqli_num_rows($result) == 0) {
-      echo "eval3";
       $query = "INSERT INTO `Team` (`teamid`, `teamname`) VALUES (NULL, '$n_teamname');";
       $exe = mysqli_query($conn, $query);
-      $query = "SELECT teamid FROM team WHERE teamname = '$n_teamname'";
+      $query = "SELECT teamid FROM Team WHERE teamname = '$n_teamname'";
       $result = mysqli_query($conn, $query);
       $row = mysqli_fetch_assoc($result);
       $val = $row['teamid'];
@@ -44,7 +44,7 @@ if($_SERVER["REQUEST_METHOD"]== "POST"){
     setcookie("userid", $n_id, time() + (86400 * 30), "/");
     $msg= "Thanks for creating a team, '$n_accountname'"; 
     echo "<script>alert('$msg');</script>"; 
-    #echo "<script>window.location.href = 'playbooks.php?userid=".$n_id."' </script>";  
+    echo "<script>window.location.href = 'playbooks.php' </script>";  
   }
 }
 

@@ -7,7 +7,7 @@ if (isset($_COOKIE["loggedin"]) && $_COOKIE["loggedin"]) {
 if($_SERVER["REQUEST_METHOD"]== "POST"){
   $n_username = $_POST["username"];
   $n_password = $_POST["password"];
-  $query = "SELECT * FROM users WHERE username = '$n_username' AND password = '$n_password'";
+  $query = "SELECT * FROM Users WHERE username = '$n_username' AND password = '$n_password'";
   $result = mysqli_query($conn, $query);
   if(mysqli_num_rows($result) == 1) {
     $msg= "Welcome '$n_accountname'"; 

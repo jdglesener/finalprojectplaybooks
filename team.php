@@ -1,8 +1,9 @@
 <?php
-/* include "conn_config.php";
+include "conn_config.php";
 ini_set('display_errors', 1);
 ini_set('display_startup_errors',1);
-error_reporting(E_ALL); */
+
+error_reporting(E_ALL);
 
 if (!isset($_COOKIE["loggedin"]) || !$_COOKIE["loggedin"]) {
   $msg = "Please sign in to view your team";
@@ -11,17 +12,17 @@ if (!isset($_COOKIE["loggedin"]) || !$_COOKIE["loggedin"]) {
 }
 
 $uid = $_COOKIE["userid"];
-$query = "SELECT * FROM users WHERE username = '$uid'";
+$query = "SELECT * FROM Users WHERE username = '$uid'";
 $result = mysqli_query($conn, $query);
 $row = mysqli_fetch_array($result);
 $teamid = $row["teamid"];
 $iscoach = $row["coach"]; 
 
-if (isset($_GET['delid'])){
-  $delid=$_GET['delid'];
-  $sql=mysqli_query($conn,"DELETE FROM articles where articleID ='$delid'");
-  echo "<script>alert('Item Deleted');</script>";
-  echo "<script>eindow.location.href = 'index.php'</script>";
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delid'])) {
+  $delid = $_POST['delid'];   
+  $sql=mysqli_query($conn,"DELETE FROM USERS where userid='$delid'AND teamid=$teamid");
+  echo "<script>alert('User Deleted');</script>";
 }
 ?>
 <!DOCTYPE html>
@@ -116,12 +117,13 @@ if (isset($_GET['delid'])){
               </thead>
               <tbody>
                 <?php 
-                $query1 = "SELECT * FROM users u
+                $query1 = "SELECT * FROM Users u
                 WHERE u.teamid = $teamid";
                 $result1 = mysqli_query($conn, $query1);
                 if ($result1) {
                   $j = 1;
                   foreach($result1 as $row1) {
+                    if ($uid != $row1['userid']) {
                 ?>
                 <tr>
                   <td><?php echo $j ?></td>
@@ -130,12 +132,13 @@ if (isset($_GET['delid'])){
                   <?php
               if ($iscoach == 1) {}
             ?>
-                  <td><form action="playbooks.php" method = "POST">
+                  <td><form action="team.php" method = "POST">
                     <input type="hidden" name = "delid" value = "<?php echo $row1["userid"];?>">
                     <button type="submit" class="btn btn-secondary">Delete</button>
                   </form></td>
             <?php $j++; } 
-          }?>
+          }
+        }?>
                 </tr>
                 <?php 
                 ?>

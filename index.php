@@ -1,5 +1,9 @@
 <?php
 include "conn_config.php";
+ini_set('display_errors', 1);
+ini_set('display_startup_errors',1);
+
+error_reporting(E_ALL);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -49,6 +53,7 @@ include "conn_config.php";
 
       <nav id="navbar" class="navbar">
         <ul>
+          <li><a class="nav-link scrollto" href="model.php">Play Calculator</a></li>
           <?php if (isset($_COOKIE["loggedin"]) && $_COOKIE["loggedin"]) {?>
           <li><a class="nav-link scrollto" href="playbooks.php">My Playbooks</a></li>
           <li class="dropdown"><a href="#"><span>Your Profile</span><i class="bi bi-chevron-down"></i></a>

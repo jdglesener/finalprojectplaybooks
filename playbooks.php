@@ -1,9 +1,9 @@
 <?php
 include "conn_config.php";
-/* ini_set('display_errors', 1);
+ini_set('display_errors', 1);
 ini_set('display_startup_errors',1);
 
-error_reporting(E_ALL); */
+error_reporting(E_ALL);
 if (!isset($_COOKIE["loggedin"]) || !$_COOKIE["loggedin"]) {
   $msg = "Please sign in to view a playbook";
   echo "<script>alert('$msg');</script>"; 
@@ -42,13 +42,13 @@ if($_SERVER["REQUEST_METHOD"]== "POST" && isset($_POST["newplaybookname"])){
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["delid"])){
   $delid = $_POST['delid'];   
   $pid = $_POST['playbookid'];
-  $sql=mysqli_query($conn,"DELETE FROM playbook where playname='$delid' AND playbookid = '$pid' AND teamid=$teamid");
+  $sql=mysqli_query($conn,"DELETE FROM Playbook where playname='$delid' AND playbookid = '$pid' AND teamid=$teamid");
   echo "<script>alert('Play Deleted');</script>";
   }
   if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["delplaybookid"])){
     $delplaybookid = $_POST['delplaybookid'];
     $delplaybook = $_POST['delplaybook'];  
-    $sql=mysqli_query($conn,"DELETE FROM playbook where playbookname='$delplaybookid' AND teamid='$teamid' AND playbookid='$delplaybook'");
+    $sql=mysqli_query($conn,"DELETE FROM Playbook where playbookname='$delplaybookid' AND teamid='$teamid' AND playbookid='$delplaybook'");
     echo "<script>alert('Playbook Deleted');</script>";
   }
 ?>
@@ -135,8 +135,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["delid"])){
       
   <?php 
             $query = "SELECT pl.playbookname, pl.playbookid FROM users u
-            JOIN team t ON u.teamid = t.teamid
-            JOIN playbook pl ON pl.teamid = t.teamid
+            JOIN Team t ON u.teamid = t.teamid
+            JOIN Playbook pl ON pl.teamid = t.teamid
             WHERE u.username = '$uid'
             GROUP BY pl.playbookname, pl.playbookid;";
             $result = mysqli_query($conn, $query);
@@ -174,8 +174,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["delid"])){
               <?php 
               $pb = $row3["playbookname"];
               $pi = $row3["playbookid"];
-              $query1 = "SELECT * FROM users u
-              JOIN team t ON u.teamid = t.teamid
+              $query1 = "SELECT * FROM Users u
+              JOIN Team t ON u.teamid = t.teamid
               JOIN playbook pl ON pl.teamid = t.teamid
               JOIN Playlist pt ON pl.playid = pt.playid
               WHERE t.teamid = $teamid AND pl.playbookname = '$pb' AND username = '$uid'";
@@ -288,9 +288,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["delid"])){
       </div>
       </div>
       <br>
+      <?php if ($iscoach  == 1) {?>
       <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#playbookStatic">
               Add A Playbook
       </button>
+      <?php } ?>
       <div class="modal fade" id="playbookStatic" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
             <div class="modal-dialog">
               <div class="modal-content">
